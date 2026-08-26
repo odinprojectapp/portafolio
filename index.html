@@ -10,22 +10,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* neutrales con bias azul, dark-first */
-  --bg:#0a0e14;
-  --bg-2:#0f141d;
-  --surface:#141b26;
-  --surface-2:#1a2331;
-  --line:#232d3d;
-  --line-2:#2f3d52;
-  --fg:#eef2f7;
-  --fg-muted:#93a1b5;
-  --fg-subtle:#5f6f85;
-  /* acento esmeralda */
-  --acc:#2fe6a8;
-  --acc-2:#12b886;
-  --acc-glow:rgba(47,230,168,.14);
-  --amber:#ffb454;
-  --coral:#ff6b6b;
+  /* PALETA DE MARCA — negro + ámbar/naranja dorado (logo David Monsalve) */
+  --bg:#000000;
+  --bg-2:#0a0806;
+  --surface:#12100c;
+  --surface-2:#1a1610;
+  --line:#26211a;
+  --line-2:#3a3124;
+  --fg:#f7f2ea;
+  --fg-muted:#b3a894;
+  --fg-subtle:#7a6f5c;
+  /* acento: dorado → naranja (degradado del logo) */
+  --acc:#f5c542;          /* dorado (parte alta del logo) */
+  --acc-2:#e8621e;         /* naranja (base del logo) */
+  --gold:#f5c542;
+  --orange:#e8621e;
+  --acc-glow:rgba(245,197,66,.15);
+  --amber:#f0a92e;         /* ámbar medio */
+  --coral:#e8621e;         /* naranja para negativos/alertas */
 
   --text-xs:clamp(.72rem,.68rem + .2vw,.8rem);
   --text-sm:clamp(.82rem,.78rem + .2vw,.92rem);
@@ -33,7 +35,7 @@
   --text-lg:clamp(1.15rem,1rem + .6vw,1.4rem);
   --text-2xl:clamp(1.7rem,1.4rem + 1.4vw,2.4rem);
   --text-3xl:clamp(2.3rem,1.8rem + 2.4vw,3.4rem);
-  --text-hero:clamp(2.8rem,2rem + 6vw,7rem);
+  --text-hero:clamp(2.3rem,1.6rem + 3.6vw,4.4rem);
 
   --ease:cubic-bezier(.16,1,.3,1);
   --ease-spring:cubic-bezier(.34,1.56,.64,1);
@@ -56,7 +58,7 @@ a{color:inherit;text-decoration:none}
   letter-spacing:.22em;text-transform:uppercase;color:var(--acc);font-weight:600}
 .wrap{max-width:var(--maxw);margin-inline:auto;padding-inline:var(--sp)}
 .accent{color:var(--acc)}
-.grad-text{background:linear-gradient(120deg,var(--fg) 30%,var(--acc));
+.grad-text{background:linear-gradient(120deg,var(--gold) 10%,var(--orange) 95%);
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 
 /* grain */
@@ -75,12 +77,14 @@ body::after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;o
   background:color-mix(in srgb,var(--surface) 70%,transparent);
   backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);
   border:1px solid var(--line-2);box-shadow:0 8px 30px -12px rgba(0,0,0,.6)}
-.nav .brand{font-family:"Sora";font-weight:700;font-size:.95rem;letter-spacing:-.01em;white-space:nowrap}
-.nav .brand span{color:var(--acc)}
+.nav .brand{display:flex;align-items:center;gap:.6rem;font-family:"Sora";font-weight:700;font-size:.9rem;white-space:nowrap}
+.brand-logo{width:30px;height:30px;border-radius:50%;flex-shrink:0}
+.brand-txt{display:flex;flex-direction:column;line-height:1}
+.brand-txt em{font-style:normal;font-weight:500;font-size:.62rem;letter-spacing:.06em;color:var(--fg-subtle)}
 .nav .links{display:flex;gap:1.3rem}
 .nav .links a{font-size:.85rem;color:var(--fg-muted);transition:color .2s}
 .nav .links a:hover{color:var(--fg)}
-.nav .cta{background:var(--acc);color:#04140d;font-weight:600;font-size:.82rem;
+.nav .cta{background:var(--acc);color:#1a0f00;font-weight:600;font-size:.82rem;
   padding:.55rem 1.1rem;border-radius:100px;white-space:nowrap;transition:transform .2s var(--ease)}
 .nav .cta:hover{transform:translateY(-2px)}
 @media(max-width:720px){.nav .links{display:none}}
@@ -90,34 +94,44 @@ body::after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;o
   padding-block:8rem 4rem;overflow:hidden}
 .hero-glow{position:absolute;inset:0;z-index:0;pointer-events:none;
   background:
-    radial-gradient(50% 40% at 75% 15%,var(--acc-glow),transparent 70%),
-    radial-gradient(45% 45% at 15% 85%,rgba(18,184,134,.08),transparent 70%)}
+    radial-gradient(55% 45% at 72% 12%,var(--acc-glow),transparent 70%),
+    radial-gradient(45% 45% at 12% 88%,rgba(232,98,30,.10),transparent 70%)}
 .hero-grid{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.5;
   background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
   background-size:56px 56px;
   mask-image:radial-gradient(ellipse 80% 60% at 50% 40%,#000 30%,transparent 75%);
   -webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 40%,#000 30%,transparent 75%)}
 .hero .wrap{position:relative;z-index:2}
+.hero-logo{width:clamp(84px,10vw,116px);height:auto;margin-bottom:1.4rem;border-radius:50%;
+  filter:drop-shadow(0 0 40px rgba(245,197,66,.25));
+  transform-origin:center center;
+  animation:logoIn 1.5s var(--ease) both}
+@keyframes logoIn{
+  0%{transform:scale(2.6);opacity:0;filter:drop-shadow(0 0 80px rgba(245,197,66,.6)) blur(6px)}
+  55%{opacity:1;filter:drop-shadow(0 0 60px rgba(245,197,66,.4)) blur(0)}
+  100%{transform:scale(1);opacity:1;filter:drop-shadow(0 0 40px rgba(245,197,66,.25))}
+}
 .hero-status{display:inline-flex;align-items:center;gap:.55rem;margin-bottom:1.8rem;
   padding:.4rem .9rem;border-radius:100px;border:1px solid var(--line-2);
   background:var(--surface);font-size:var(--text-xs);color:var(--fg-muted);font-family:"JetBrains Mono"}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 0 var(--acc);
   animation:pulse 2.2s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 var(--acc-glow)}70%{box-shadow:0 0 0 8px transparent}100%{box-shadow:0 0 0 0 transparent}}
-.hero h1{font-size:var(--text-hero);font-weight:800;max-width:16ch;margin-bottom:1.6rem}
-.hero .lead{font-size:var(--text-lg);color:var(--fg-muted);max-width:52ch;margin-bottom:2.4rem}
+.hero h1{font-size:var(--text-hero);font-weight:800;max-width:20ch;margin-bottom:1.3rem;line-height:1.05}
+.hero .lead{font-size:var(--text-lg);color:var(--fg-muted);max-width:54ch;margin-bottom:2rem}
+.hero-status{margin-bottom:1.3rem}
 .hero-actions{display:flex;flex-wrap:wrap;gap:1rem;align-items:center}
 .btn{display:inline-flex;align-items:center;gap:.6rem;font-weight:600;font-size:.95rem;
   padding:.9rem 1.6rem;border-radius:12px;transition:transform .25s var(--ease),box-shadow .25s}
-.btn-pri{background:var(--acc);color:#04140d;box-shadow:0 10px 30px -10px var(--acc)}
+.btn-pri{background:var(--acc);color:#1a0f00;box-shadow:0 10px 30px -10px var(--acc)}
 .btn-pri:hover{transform:translateY(-3px);box-shadow:0 16px 40px -12px var(--acc)}
 .btn-sec{border:1px solid var(--line-2);color:var(--fg);background:var(--surface)}
 .btn-sec:hover{transform:translateY(-3px);border-color:var(--acc)}
 .btn svg{width:18px;height:18px}
 
 /* hero stats row */
-.hero-stats{display:flex;flex-wrap:wrap;gap:clamp(1.5rem,5vw,4rem);margin-top:4rem;
-  padding-top:2.4rem;border-top:1px solid var(--line)}
+.hero-stats{display:flex;flex-wrap:wrap;gap:clamp(1.5rem,5vw,3.5rem);margin-top:2.6rem;
+  padding-top:2rem;border-top:1px solid var(--line)}
 .stat .num{font-family:"Sora";font-weight:800;font-size:clamp(2rem,1.5rem+2vw,3rem);
   color:var(--fg);line-height:1;font-variant-numeric:tabular-nums}
 .stat .num .accent{color:var(--acc)}
@@ -130,6 +144,23 @@ section{position:relative}
 .sec-head .eyebrow{display:block;margin-bottom:1rem}
 .sec-head h2{font-size:var(--text-3xl);margin-bottom:1rem}
 .sec-head p{color:var(--fg-muted);font-size:var(--text-lg)}
+
+/* pains / dolores */
+.pains{display:grid;gap:1.1rem;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.pain{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.6rem 1.7rem;overflow:hidden;transition:border-color .3s,transform .3s var(--ease)}
+.pain::before{content:"";position:absolute;inset-block:0;inset-inline-start:0;width:3px;
+  background:linear-gradient(var(--gold),var(--orange));opacity:.5;transition:opacity .3s}
+.pain:hover{border-color:var(--line-2);transform:translateY(-4px)}
+.pain:hover::before{opacity:1}
+.pain .quote{display:flex;gap:.7rem;margin-bottom:1rem}
+.pain .quote svg{width:20px;height:20px;stroke:var(--orange);flex-shrink:0;margin-top:2px}
+.pain .quote p{font-family:"Sora";font-weight:600;font-size:1.02rem;color:var(--fg);line-height:1.35}
+.pain .fix{display:flex;gap:.6rem;padding-top:.9rem;border-top:1px solid var(--line);
+  font-size:var(--text-sm);color:var(--fg-muted)}
+.pain .fix svg{width:16px;height:16px;stroke:var(--gold);flex-shrink:0;margin-top:3px}
+.pain .fix b{color:var(--gold);font-weight:600}
+.pain.feature{background:linear-gradient(150deg,color-mix(in srgb,var(--orange) 10%,var(--surface)),var(--surface))}
 
 /* value cards */
 .values{display:grid;gap:1.2rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
@@ -200,15 +231,15 @@ section{position:relative}
 .step h3{font-size:var(--text-lg);margin-bottom:.4rem}
 .step p{color:var(--fg-muted);font-size:var(--text-sm)}
 
-/* skills marquee */
+/* skills marquee (corre lento y legible) */
 .skills-strip{border-block:1px solid var(--line);padding-block:2.2rem;overflow:hidden;
-  -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
-  mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
-.marquee{display:flex;gap:2.5rem;width:max-content;animation:scroll 28s linear infinite}
-.marquee span{font-family:"Sora";font-weight:600;font-size:clamp(1.2rem,3vw,2rem);color:var(--fg-subtle);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+.marquee{display:flex;gap:2.5rem;width:max-content;animation:scroll 150s linear infinite}
+.marquee span{font-family:"Sora";font-weight:600;font-size:clamp(1.1rem,2.4vw,1.7rem);color:var(--fg-subtle);
   display:flex;align-items:center;gap:2.5rem;white-space:nowrap}
-.marquee span::after{content:"◆";color:var(--acc);font-size:.7em}
-@keyframes scroll{to{transform:translateX(-50%)}}
+.marquee span::after{content:"◆";color:var(--acc);font-size:.6em}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
 /* about / experience */
 .about{display:grid;gap:clamp(2rem,5vw,4rem);grid-template-columns:1fr;align-items:start}
@@ -242,8 +273,35 @@ footer{border-top:1px solid var(--line);padding-block:2.5rem;text-align:center;
 .reveal{opacity:0;transform:translateY(34px)}
 .reveal.show{opacity:1;transform:none;transition:opacity .8s var(--ease),transform .8s var(--ease)}
 @media(prefers-reduced-motion:reduce){
-  *{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  *:not(.marquee){animation-duration:.01ms!important;transition-duration:.01ms!important}
   .reveal{opacity:1;transform:none}
+  .marquee{animation-duration:150s!important}
+}
+
+/* ===== MÓVIL ===== */
+@media(max-width:720px){
+  .nav{gap:.6rem;padding:.5rem .5rem .5rem .8rem;width:calc(100% - 1.6rem);justify-content:space-between}
+  .brand-txt{font-size:.82rem}
+  .brand-txt em{font-size:.58rem}
+  .nav .cta{font-size:.78rem;padding:.5rem .9rem}
+  .hero{padding-block:6.5rem 3rem}
+  .hero-status{font-size:.68rem;padding:.35rem .7rem}
+  .hero-stats{gap:1.6rem}
+  .stat{flex:1 1 40%;min-width:130px}
+  .pains,.values,.demos{grid-template-columns:1fr}
+  .pain,.vcard{padding:1.4rem}
+  .demo-preview{height:190px}
+  .steps .step{grid-template-columns:auto 1fr;gap:1rem}
+  .marquee span{font-size:1.15rem;gap:1.6rem}
+  .marquee{gap:1.6rem}
+  .contact-row{gap:1rem;flex-direction:column;align-items:flex-start}
+  .final-actions{flex-direction:column}
+  .final-actions .btn{width:100%;justify-content:center}
+}
+@media(max-width:420px){
+  .brand-logo{width:26px;height:26px}
+  .nav .links{display:none}
+  .hero h1{font-size:2.1rem}
 }
 </style>
 </head>
@@ -251,7 +309,7 @@ footer{border-top:1px solid var(--line);padding-block:2.5rem;text-align:center;
 <div class="progress" id="progress"></div>
 
 <nav class="nav">
-  <div class="brand">David<span>.</span>Monsalve</div>
+  <a class="brand" href="#top"><img src="logo.png" alt="Logo David Monsalve" class="brand-logo"><span class="brand-txt">David Monsalve<em>Guzmán</em></span></a>
   <div class="links">
     <a href="#valor">Qué hago</a>
     <a href="#demos">Demos</a>
@@ -262,12 +320,13 @@ footer{border-top:1px solid var(--line);padding-block:2.5rem;text-align:center;
 </nav>
 
 <!-- HERO -->
-<header class="hero">
+<header class="hero" id="top">
   <div class="hero-glow"></div>
   <div class="hero-grid"></div>
   <div class="wrap">
+    <img src="logo.png" alt="David Monsalve Guzmán — Transformando datos en decisiones" class="hero-logo">
     <div class="hero-status reveal"><span class="dot"></span> Disponible para proyectos · Santa Marta, Colombia</div>
-    <h1 class="reveal">Convierto el caos de datos en <span class="grad-text">decisiones claras</span>.</h1>
+    <h1 class="reveal">Transformando <span class="grad-text">datos en decisiones</span>, procesos en soluciones.</h1>
     <p class="lead reveal">Analista de datos especializado en Power BI. No solo hago tableros bonitos — arreglo de dónde salen los datos para que dejen de caerse. Experiencia con operaciones de distribución a gran escala.</p>
     <div class="hero-actions reveal">
       <a href="#demos" class="btn btn-pri" data-magnetic>
@@ -285,6 +344,75 @@ footer{border-top:1px solid var(--line);padding-block:2.5rem;text-align:center;
     </div>
   </div>
 </header>
+
+<!-- DOLORES -->
+<section class="sec" id="dolores">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">¿Te suena familiar?</span>
+      <h2>Los problemas que <span class="accent">ya conozco de primera mano</span></h2>
+      <p>Antes de hablar de dashboards, hablemos de lo que realmente te quita el sueño con tus datos. Estos dolores se repiten en toda operación colombiana — y sé cómo resolverlos.</p>
+    </div>
+    <div class="pains">
+
+      <div class="pain reveal">
+        <div class="quote">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          <p>"Cierro el mes y los números no cuadran, y nadie sabe por qué."</p>
+        </div>
+        <div class="fix">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          <span>Encuentro dónde se rompe el dato entre Excel, ERP y SharePoint, y dejo <b>una sola fuente de verdad</b>.</span>
+        </div>
+      </div>
+
+      <div class="pain reveal">
+        <div class="quote">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/></svg>
+          <p>"Todo el reporte vive en el Excel de una sola persona. Si falta, quedamos ciegos."</p>
+        </div>
+        <div class="fix">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          <span>Documento y automatizo ese proceso para que dependa de un <b>sistema, no de una persona</b>.</span>
+        </div>
+      </div>
+
+      <div class="pain reveal">
+        <div class="quote">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg>
+          <p>"Consolidar a mano los archivos de cada sede nos come dos días cada semana."</p>
+        </div>
+        <div class="fix">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          <span>Automatizo la consolidación para que <b>el reporte se arme solo</b> y el equipo dedique el tiempo a decidir.</span>
+        </div>
+      </div>
+
+      <div class="pain reveal">
+        <div class="quote">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+          <p>"La gerencia ve una cifra distinta a la de ayer y se cae la credibilidad del informe."</p>
+        </div>
+        <div class="fix">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          <span>Construyo sobre una fuente única y controlada: <b>el número es el mismo lo mires cuando lo mires</b>.</span>
+        </div>
+      </div>
+
+      <div class="pain reveal feature">
+        <div class="quote">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg>
+          <p>"Cuando la operación crece —más bodegas, más rutas— el Excel colapsa y no aguanta."</p>
+        </div>
+        <div class="fix">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          <span>Diseño la base para que <b>escale con la operación</b> — con la misma lógica que apliqué en distribución para Bavaria (AB InBev).</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
 
 <!-- VALOR -->
 <section class="sec" id="valor">
@@ -322,8 +450,8 @@ footer{border-top:1px solid var(--line);padding-block:2.5rem;text-align:center;
 <!-- SKILLS MARQUEE -->
 <div class="skills-strip reveal">
   <div class="marquee">
-    <span>Power BI</span><span>DAX</span><span>Power Query</span><span>SQL</span><span>Supabase</span><span>SharePoint</span><span>ETL</span><span>Modelado de datos</span><span>Automatización</span>
-    <span>Power BI</span><span>DAX</span><span>Power Query</span><span>SQL</span><span>Supabase</span><span>SharePoint</span><span>ETL</span><span>Modelado de datos</span><span>Automatización</span>
+    <span>Power BI</span><span>DAX</span><span>Power Query</span><span>Lenguaje M</span><span>SQL</span><span>Supabase</span><span>SharePoint</span><span>Datos vía API</span><span>ETL</span><span>Modelado de datos</span><span>Automatización</span>
+    <span>Power BI</span><span>DAX</span><span>Power Query</span><span>Lenguaje M</span><span>SQL</span><span>Supabase</span><span>SharePoint</span><span>Datos vía API</span><span>ETL</span><span>Modelado de datos</span><span>Automatización</span>
   </div>
 </div>
 
