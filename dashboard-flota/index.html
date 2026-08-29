@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard Eficiencia de Flota · David Monsalve</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#0E1420; --panel:#16202F; --panel-2:#1D2A3D; --line:#28394F;
+    --acero:#4E82C0; --acero-2:#6FA0D8; --ambar:#F2A03D;
+    --blanco:#EDF2F8; --gris:#9DB0C5; --faint:#63768C;
+    --verde:#46C08A; --rojo:#E5674B; --amar:#EBB63C;
+    --fd:'Sora',system-ui,sans-serif; --fb:'Inter',system-ui,sans-serif; --fm:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#080C13;color:var(--blanco);font-family:var(--fb);padding:20px;display:flex;justify-content:center}
+  .dash{width:1280px;max-width:100%;background:var(--bg);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+
+  .head{background:linear-gradient(100deg,#16202F,#101825);padding:22px 28px;display:flex;align-items:center;gap:18px;border-bottom:1px solid var(--line);position:relative}
+  .head::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--acero),var(--ambar))}
+  .logo{width:46px;height:46px;border-radius:11px;background:linear-gradient(135deg,var(--acero),#2C5A8A);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .logo svg{width:26px;height:26px;stroke:var(--ambar);fill:none;stroke-width:2}
+  .head h1{font-family:var(--fd);font-size:1.25rem;font-weight:700}
+  .head .sub{font-size:.8rem;color:var(--gris);margin-top:2px}
+  .head .meta{margin-left:auto;text-align:right;font-family:var(--fm);font-size:.72rem;color:var(--faint);line-height:1.7}
+  .head .meta b{color:var(--acero-2)}
+
+  .filtros{display:flex;gap:8px;padding:14px 28px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap;align-items:center}
+  .filtros .lbl{font-family:var(--fm);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-right:4px}
+  .chip{font-size:.78rem;padding:.38rem .85rem;border-radius:8px;background:var(--panel-2);border:1px solid var(--line);color:var(--gris);cursor:pointer;transition:all .15s;user-select:none}
+  .chip:hover{border-color:var(--acero);color:var(--acero-2)}
+  .chip.on{background:rgba(78,130,192,.22);border-color:var(--acero);color:var(--acero-2);font-weight:600}
+  .reset{margin-left:auto;font-size:.72rem;color:var(--faint);cursor:pointer;border:1px solid var(--line);border-radius:7px;padding:.35rem .7rem}
+  .reset:hover{color:var(--ambar);border-color:var(--ambar)}
+
+  .kpis{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:14px;padding:20px 28px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;transition:border-color .2s}
+  .kpi:hover{border-color:var(--acero)}
+  .kpi .l{font-family:var(--fm);font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .kpi .v{font-family:var(--fd);font-weight:800;font-size:2rem;margin-top:6px;line-height:1}
+  .kpi .v small{font-size:1rem;font-weight:600}
+  .kpi .d{font-size:.72rem;margin-top:8px}
+  .kpi .v.verde{color:var(--verde)}.kpi .v.ambar{color:var(--ambar)}.kpi .v.acero{color:var(--acero-2)}.kpi .v.rojo{color:var(--rojo)}
+  /* KPI North Star destacado */
+  .kpi.star{background:linear-gradient(135deg,rgba(70,192,138,.14),var(--panel));border-color:rgba(70,192,138,.4);display:flex;flex-direction:column;justify-content:center}
+  .kpi.star .l{color:var(--verde)}
+  .kpi.star .v{font-size:3.4rem;margin-top:4px}
+  .kpi.star .v small{font-size:1.6rem}
+  .kpi.star .tag{position:absolute;top:12px;right:14px;font-family:var(--fm);font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--verde);border:1px solid rgba(70,192,138,.4);border-radius:5px;padding:.15rem .45rem}
+  .up{color:var(--verde)}.down{color:var(--rojo)}
+
+  .grid{display:grid;grid-template-columns:1.35fr 1fr;gap:14px;padding:0 28px 20px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .card h3{font-family:var(--fd);font-size:.92rem;font-weight:700;margin-bottom:2px}
+  .card .cs{font-size:.72rem;color:var(--faint);margin-bottom:14px}
+  .full{grid-column:1 / -1}
+
+  .barh{display:flex;flex-direction:column;gap:11px}
+  .barh .row{display:grid;grid-template-columns:105px 1fr 52px;gap:12px;align-items:center;font-size:.8rem;cursor:pointer;padding:2px 0;border-radius:6px;transition:background .12s}
+  .barh .row:hover{background:var(--panel-2)}
+  .barh .row.dim{opacity:.3}
+  .barh .nm{color:var(--gris);font-weight:500}
+  .barh .tk{height:22px;background:var(--panel-2);border-radius:6px;position:relative;overflow:hidden}
+  .barh .tk .real{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:linear-gradient(90deg,var(--acero),var(--acero-2));transition:width .4s}
+  .barh .tk .real.bajo{background:linear-gradient(90deg,#E5674B,#EBB63C)}
+  .barh .tk .goal{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ambar)}
+  .barh .val{font-family:var(--fm);font-weight:600;text-align:right;color:var(--blanco)}
+
+  .donut-wrap{display:flex;align-items:center;gap:18px}
+  .leg{display:flex;flex-direction:column;gap:9px;font-size:.8rem}
+  .leg .li{display:flex;align-items:center;gap:8px;color:var(--gris);cursor:pointer}
+  .leg .li:hover{color:var(--blanco)}
+  .leg .dot{width:11px;height:11px;border-radius:3px;flex:0 0 auto}
+  .leg b{color:var(--blanco);font-family:var(--fm);margin-left:auto}
+
+  /* MAPA DE CALOR de rutas/poblaciones */
+  .heat{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .cell{border-radius:9px;padding:12px 12px 10px;position:relative;cursor:pointer;transition:transform .12s,outline .12s;outline:2px solid transparent;min-height:88px;display:flex;flex-direction:column;justify-content:space-between}
+  .cell:hover{transform:translateY(-2px)}
+  .cell.sel{outline:2px solid var(--blanco)}
+  .cell .pob{font-size:.78rem;font-weight:600;line-height:1.2}
+  .cell .cons{font-family:var(--fm);font-size:1.15rem;font-weight:700;margin-top:6px}
+  .cell .km{font-family:var(--fm);font-size:.6rem;opacity:.8}
+  .heat-scale{display:flex;align-items:center;gap:8px;margin-top:12px;font-family:var(--fm);font-size:.64rem;color:var(--faint)}
+  .heat-scale .grad{flex:1;height:8px;border-radius:999px;background:linear-gradient(90deg,#2b6a4d,#EBB63C,#E5674B)}
+
+  table{width:100%;border-collapse:collapse;font-size:.8rem}
+  th{text-align:left;font-family:var(--fm);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);padding:8px 10px;border-bottom:1px solid var(--line)}
+  td{padding:9px 10px;border-bottom:1px solid rgba(40,57,79,.5)}
+  td.mono{font-family:var(--fm)}
+  tr.hide{display:none}
+  .est{font-size:.68rem;padding:.15rem .5rem;border-radius:999px;font-weight:600}
+  .est.ok{background:rgba(70,192,138,.16);color:var(--verde)}
+  .est.rev{background:rgba(235,182,60,.16);color:var(--amar)}
+  .est.crit{background:rgba(229,103,75,.16);color:var(--rojo)}
+
+  .foot{padding:14px 28px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;font-size:.72rem;color:var(--faint);flex-wrap:wrap;gap:8px}
+  .foot b{color:var(--gris)}
+  .badge-caso{font-family:var(--fm);font-size:.6rem;background:rgba(242,160,61,.12);color:var(--ambar);border:1px solid rgba(242,160,61,.3);padding:.2rem .5rem;border-radius:6px}
+
+  /* tooltip */
+  #tip{position:fixed;pointer-events:none;background:#0a1018;border:1px solid var(--acero);border-radius:8px;padding:8px 11px;font-size:.74rem;color:var(--blanco);box-shadow:0 8px 24px rgba(0,0,0,.5);opacity:0;transition:opacity .12s;z-index:200;max-width:220px}
+  #tip b{color:var(--acero-2)}
+  .filtro-activo{font-size:.7rem;color:var(--ambar);padding:0 28px 10px;font-family:var(--fm)}
+  @media(max-width:900px){.kpis{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.heat{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div id="tip"></div>
+<div class="dash">
+  <div class="head">
+    <div class="logo"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7zM5.5 19a2 2 0 100-4 2 2 0 000 4zM18.5 19a2 2 0 100-4 2 2 0 000 4z"/></svg></div>
+    <div><h1>Eficiencia de Flota &amp; Combustible</h1><div class="sub">Control de rendimiento por vehículo · Distribución Bavaria — Santa Marta y poblaciones del Magdalena</div></div>
+    <div class="meta">Flota: <b>68 vehículos</b> · Periodo: <b>12 meses</b><br>Actualizado: <b>oct 2024</b> · <span style="color:var(--verde)">● interactivo</span></div>
+  </div>
+
+  <div class="filtros">
+    <span class="lbl">Marca</span>
+    <span class="chip on" data-fil="marca" data-val="todas">Todas</span>
+    <span class="chip" data-fil="marca" data-val="Chevrolet NPR">Chevrolet</span>
+    <span class="chip" data-fil="marca" data-val="Hino 300">Hino</span>
+    <span class="chip" data-fil="marca" data-val="JAC 1040">JAC</span>
+    <span class="chip" data-fil="marca" data-val="Foton Aumark">Foton</span>
+    <span class="chip" data-fil="marca" data-val="Isuzu ELF">Isuzu</span>
+    <span class="reset" id="reset">↺ Limpiar filtros</span>
+  </div>
+  <div class="filtro-activo" id="filtroActivo"></div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid">
+    <!-- TENDENCIA MENSUAL (la prueba del logro, arriba tras los KPIs) -->
+    <div class="card full">
+      <h3>Tendencia mensual del gasto de combustible</h3>
+      <div class="cs">Índice de gasto por mes (base 100 = punto de partida) · la línea baja cuando empiezan las acciones · <b style="color:var(--acero-2)">pasa el mouse sobre cada mes</b></div>
+      <div id="tendencia"></div>
+    </div>
+
+    <div class="card">
+      <h3>Rendimiento por marca vs. estándar de fábrica</h3>
+      <div class="cs">Barra = km/galón real · línea ámbar = objetivo del fabricante · <b style="color:var(--acero-2)">clic para filtrar</b></div>
+      <div class="barh" id="barMarcas"></div>
+    </div>
+
+    <div class="card">
+      <h3>Origen de las anomalías</h3>
+      <div class="cs">Qué causaba el consumo excesivo</div>
+      <div class="donut-wrap">
+        <svg width="140" height="140" viewBox="0 0 42 42" id="donut">
+          <circle cx="21" cy="21" r="15.9" fill="none" stroke="#1D2A3D" stroke-width="6"/>
+          <circle cx="21" cy="21" r="15.9" fill="none" stroke="#E5674B" stroke-width="6" stroke-dasharray="32 68" stroke-dashoffset="25"/>
+          <circle cx="21" cy="21" r="15.9" fill="none" stroke="#EBB63C" stroke-width="6" stroke-dasharray="28 72" stroke-dashoffset="-7"/>
+          <circle cx="21" cy="21" r="15.9" fill="none" stroke="#4E82C0" stroke-width="6" stroke-dasharray="22 78" stroke-dashoffset="-35"/>
+          <circle cx="21" cy="21" r="15.9" fill="none" stroke="#6FA0D8" stroke-width="6" stroke-dasharray="18 82" stroke-dashoffset="-57"/>
+          <text x="21" y="20" text-anchor="middle" fill="#EDF2F8" font-size="7" font-weight="700" font-family="Sora">14</text>
+          <text x="21" y="26" text-anchor="middle" fill="#63768C" font-size="3.2" font-family="JetBrains Mono">CASOS</text>
+        </svg>
+        <div class="leg">
+          <div class="li"><span class="dot" style="background:#E5674B"></span>Robo / fuga de combustible <b>5</b></div>
+          <div class="li"><span class="dot" style="background:#EBB63C"></span>Mantenimiento vencido <b>4</b></div>
+          <div class="li"><span class="dot" style="background:#4E82C0"></span>Llantas descalibradas <b>3</b></div>
+          <div class="li"><span class="dot" style="background:#6FA0D8"></span>Filtros / inyección <b>2</b></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAPA DE CALOR -->
+    <div class="card full">
+      <h3>Mapa de calor — consumo por población</h3>
+      <div class="cs">Color = intensidad de consumo de combustible (rojo = mayor gasto) · <b style="color:var(--acero-2)">clic en una población para filtrar</b></div>
+      <div class="heat" id="heat"></div>
+      <div class="heat-scale"><span>Menor consumo</span><span class="grad"></span><span>Mayor consumo</span></div>
+    </div>
+
+    <div class="card full">
+      <h3>Alertas automáticas — vehículos que se salen del rango</h3>
+      <div class="cs">El sistema marca solo los que necesitan atención, para actuar antes de que se dispare el gasto</div>
+      <table><thead><tr><th>Vehículo</th><th>Marca</th><th>Población</th><th>Rend. real</th><th>Objetivo</th><th>Causa probable</th><th>Estado</th></tr></thead>
+        <tbody id="tabla"></tbody></table>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>Diseñado y desarrollado por <b>David Monsalve</b> · Analista de datos &amp; operaciones</span>
+    <span class="badge-caso">Basado en un caso real · datos ilustrativos con fines de portafolio</span>
+  </div>
+</div>
+
+<script>
+// ===== DATOS (caso flota Bavaria) =====
+const marcas=[
+  {marca:'Chevrolet NPR', real:34.1, goal:34.0},
+  {marca:'Isuzu ELF',     real:33.0, goal:32.8},
+  {marca:'Hino 300',      real:31.6, goal:32.5},
+  {marca:'JAC 1040',      real:30.2, goal:31.0},
+  {marca:'Foton Aumark',  real:27.4, goal:33.0},
+];
+// poblaciones con consumo (galones/mes aprox) y km recorridos
+const poblaciones=[
+  {pob:'Santa Marta',   cons:9800, km:52000, heat:0.62},
+  {pob:'Ciénaga',       cons:6400, km:31000, heat:0.55},
+  {pob:'Fundación',     cons:7200, km:26000, heat:0.82},
+  {pob:'Aracataca',     cons:5100, km:18500, heat:0.74},
+  {pob:'El Banco',      cons:8300, km:22000, heat:0.95},
+  {pob:'Plato',         cons:4700, km:19000, heat:0.48},
+  {pob:'Pivijay',       cons:3900, km:14500, heat:0.66},
+  {pob:'Zona Bananera', cons:5600, km:24000, heat:0.40},
+];
+const vehiculos=[
+  {id:'FLT-07', marca:'Foton Aumark',  pob:'Fundación',    real:27.4, goal:33.0, causa:'Posible fuga / robo',        est:'crit'},
+  {id:'FLT-33', marca:'Foton Aumark',  pob:'El Banco',     real:26.9, goal:33.0, causa:'Posible fuga / robo',        est:'crit'},
+  {id:'FLT-22', marca:'Hino 300',      pob:'Santa Marta',  real:29.1, goal:32.5, causa:'Mantenimiento vencido',      est:'rev'},
+  {id:'FLT-41', marca:'JAC 1040',      pob:'Aracataca',    real:28.8, goal:31.0, causa:'Llantas descalibradas',      est:'rev'},
+  {id:'FLT-15', marca:'Hino 300',      pob:'Ciénaga',      real:30.0, goal:32.5, causa:'Filtros / inyección',        est:'rev'},
+  {id:'FLT-05', marca:'Chevrolet NPR', pob:'Santa Marta',  real:34.1, goal:34.0, causa:'—',                          est:'ok'},
+  {id:'FLT-58', marca:'Isuzu ELF',     pob:'Plato',        real:33.0, goal:32.8, causa:'—',                          est:'ok'},
+  {id:'FLT-11', marca:'Chevrolet NPR', pob:'Zona Bananera',real:33.8, goal:34.0, causa:'—',                          est:'ok'},
+];
+
+// gasto mensual: índice base 100. Meses 1-3 = fase análisis; desde el 4 caen las acciones.
+const meses=[
+  {m:'Ene',idx:100,fase:'analisis'},{m:'Feb',idx:99,fase:'analisis'},{m:'Mar',idx:101,fase:'analisis'},
+  {m:'Abr',idx:96,fase:'accion'},{m:'May',idx:90,fase:'accion'},{m:'Jun',idx:86,fase:'accion'},
+  {m:'Jul',idx:83,fase:'accion'},{m:'Ago',idx:81,fase:'accion'},{m:'Sep',idx:79,fase:'accion'},
+  {m:'Oct',idx:77,fase:'accion'},{m:'Nov',idx:75,fase:'accion'},{m:'Dic',idx:74.6,fase:'accion'},
+];
+
+let filtro={marca:'todas', pob:null};
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+
+function vehFiltrados(){
+  return vehiculos.filter(v=>(filtro.marca==='todas'||v.marca===filtro.marca)&&(!filtro.pob||v.pob===filtro.pob));
+}
+function render(){
+  const vf=vehFiltrados();
+  // KPIs dinámicos
+  const rendProm=vf.length?(vf.reduce((a,v)=>a+v.real,0)/vf.length):0;
+  const fuera=vf.filter(v=>v.real<v.goal-0.5).length;
+  const anom=vf.filter(v=>v.causa!=='—').length;
+  $('#kpis').innerHTML=`
+    <div class="kpi star"><span class="tag">Resultado clave</span><div class="l">Ahorro en combustible</div><div class="v verde">25.4<small>%</small></div><div class="d up">▲ vs. línea base inicial · 12 meses</div></div>
+    <div class="kpi"><div class="l">Rendimiento ${filtro.marca==='todas'&&!filtro.pob?'promedio':'(filtrado)'}</div><div class="v acero">${rendProm.toFixed(1)} <small>km/gal</small></div><div class="d">${vf.length} vehículo(s)</div></div>
+    <div class="kpi"><div class="l">Fuera de rango</div><div class="v ambar">${fuera}<small> / ${vf.length}</small></div><div class="d down">${filtro.marca==='todas'&&!filtro.pob?'▼ de 23 iniciales':'en selección'}</div></div>
+    <div class="kpi"><div class="l">Anomalías detectadas</div><div class="v rojo">${anom}</div><div class="d">a corregir</div></div>`;
+  // barras marca
+  $('#barMarcas').innerHTML=marcas.map(m=>{
+    const pct=Math.min(100,m.real/40*100), gp=Math.min(100,m.goal/40*100), bajo=m.real<m.goal-1;
+    const dim=(filtro.marca!=='todas'&&filtro.marca!==m.marca)?'dim':'';
+    return `<div class="row ${dim}" data-marca="${m.marca}"><span class="nm">${m.marca}</span>
+      <span class="tk"><i class="real ${bajo?'bajo':''}" style="width:${pct}%"></i><i class="goal" style="left:${gp}%"></i></span>
+      <span class="val">${m.real}</span></div>`;
+  }).join('');
+  $$('#barMarcas .row').forEach(r=>r.onclick=()=>{ setMarca(r.dataset.marca===filtro.marca?'todas':r.dataset.marca); });
+  // heatmap
+  const max=Math.max(...poblaciones.map(p=>p.heat));
+  $('#heat').innerHTML=poblaciones.map(p=>{
+    const t=p.heat/max; const col=heatColor(t);
+    const sel=filtro.pob===p.pob?'sel':'';
+    return `<div class="cell ${sel}" data-pob="${p.pob}" style="background:${col.bg};color:${col.tx}">
+      <div class="pob">${p.pob}</div><div><div class="cons">${(p.cons/1000).toFixed(1)}k gal</div><div class="km">${(p.km/1000).toFixed(0)}k km/mes</div></div></div>`;
+  }).join('');
+  $$('#heat .cell').forEach(c=>{
+    c.onclick=()=>{ filtro.pob=filtro.pob===c.dataset.pob?null:c.dataset.pob; render(); };
+    c.onmousemove=e=>{ const p=poblaciones.find(x=>x.pob===c.dataset.pob); tip(e,`<b>${p.pob}</b><br>Consumo: ${p.cons.toLocaleString('es-CO')} gal/mes<br>Recorrido: ${p.km.toLocaleString('es-CO')} km/mes<br>Intensidad: ${Math.round(p.heat*100)}%`); };
+    c.onmouseleave=()=>tipHide();
+  });
+  // tabla
+  $('#tabla').innerHTML=vehiculos.map(v=>{
+    const vis=(filtro.marca==='todas'||v.marca===filtro.marca)&&(!filtro.pob||v.pob===filtro.pob);
+    const col=v.est==='crit'?'var(--rojo)':v.est==='rev'?'var(--amar)':'var(--verde)';
+    const lbl=v.est==='crit'?'Crítico':v.est==='rev'?'Revisar':'Óptimo';
+    return `<tr class="${vis?'':'hide'}"><td class="mono">${v.id}</td><td>${v.marca}</td><td>${v.pob}</td>
+      <td class="mono" style="color:${col}">${v.real}</td><td class="mono">${v.goal}</td><td>${v.causa}</td>
+      <td><span class="est ${v.est}">${lbl}</span></td></tr>`;
+  }).join('');
+  // filtro activo
+  const parts=[]; if(filtro.marca!=='todas')parts.push('Marca: '+filtro.marca); if(filtro.pob)parts.push('Población: '+filtro.pob);
+  $('#filtroActivo').textContent=parts.length?('▸ Filtrando por — '+parts.join('  ·  ')):'';
+  $$('.chip[data-fil="marca"]').forEach(c=>c.classList.toggle('on',c.dataset.val===filtro.marca));
+  tendencia();
+}
+// Gráfico de tendencia mensual (SVG interactivo, hover por mes)
+function tendencia(){
+  const W=1000,H=210,pl=44,pb=26,pt=14;
+  const min=70,max=104;
+  const x=i=>pl+(W-pl-8)*(i/(meses.length-1));
+  const y=v=>pt+(H-pt-pb)*(1-(v-min)/(max-min));
+  const pts=meses.map((d,i)=>`${x(i)},${y(d.idx)}`).join(' ');
+  const area=`${pl},${H-pb} ${pts} ${x(meses.length-1)},${H-pb}`;
+  const inicioAccion=meses.findIndex(d=>d.fase==='accion');
+  const dots=meses.map((d,i)=>`<circle class="mdot" data-i="${i}" cx="${x(i)}" cy="${y(d.idx)}" r="9" fill="transparent"/><circle cx="${x(i)}" cy="${y(d.idx)}" r="3.5" fill="${d.fase==='analisis'?'#E5674B':'#4E82C0'}"/>`).join('');
+  const gridY=[100,85,70].map(v=>`<line x1="${pl}" y1="${y(v)}" x2="${W}" y2="${y(v)}" stroke="#28394F" stroke-width="1" stroke-dasharray="${v===85?'4 6':'0'}"/><text x="${pl-8}" y="${y(v)+3}" text-anchor="end" fill="#63768C" font-size="11" font-family="JetBrains Mono">${v}</text>`).join('');
+  const xlabels=meses.map((d,i)=>`<text x="${x(i)}" y="${H-8}" text-anchor="middle" fill="#63768C" font-size="10.5" font-family="JetBrains Mono">${d.m}</text>`).join('');
+  $('#tendencia').innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="overflow:visible">
+    <rect x="${pl}" y="${pt}" width="${x(inicioAccion)-pl}" height="${H-pt-pb}" fill="#E5674B" opacity="0.05"/>
+    <text x="${pl+8}" y="${pt+16}" fill="#E5674B" font-size="12" font-family="JetBrains Mono" opacity="0.75">análisis</text>
+    <text x="${x(inicioAccion)+8}" y="${pt+16}" fill="#46C08A" font-size="12" font-family="JetBrains Mono" opacity="0.85">acciones aplicadas →</text>
+    ${gridY}
+    <polygon points="${area}" fill="url(#gt)" opacity="0.22"/>
+    <polyline points="${pts}" fill="none" stroke="#4E82C0" stroke-width="3"/>
+    <circle cx="${x(meses.length-1)}" cy="${y(meses[meses.length-1].idx)}" r="5" fill="#46C08A"/>
+    <text x="${x(meses.length-1)}" y="${y(meses[meses.length-1].idx)-12}" text-anchor="end" fill="#46C08A" font-size="13" font-weight="700" font-family="JetBrains Mono">-25.4%</text>
+    ${dots}${xlabels}
+    <defs><linearGradient id="gt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4E82C0"/><stop offset="1" stop-color="#4E82C0" stop-opacity="0"/></linearGradient></defs>
+  </svg>`;
+  $$('#tendencia .mdot').forEach(c=>{
+    c.style.cursor='pointer';
+    c.onmousemove=e=>{ const d=meses[+c.dataset.i]; const ahorro=(100-d.idx).toFixed(1); tip(e,`<b>${d.m}</b><br>Índice de gasto: ${d.idx}<br>${d.fase==='analisis'?'Fase de análisis':'Ahorro acumulado: '+ahorro+'%'}`); };
+    c.onmouseleave=()=>tipHide();
+  });
+}
+function setMarca(m){ filtro.marca=m; render(); }
+function heatColor(t){ // t 0..1
+  // verde -> ámbar -> rojo
+  let r,g,b;
+  if(t<0.5){ const k=t/0.5; r=Math.round(43+(235-43)*k); g=Math.round(106+(182-106)*k); b=Math.round(77+(60-77)*k); }
+  else{ const k=(t-0.5)/0.5; r=Math.round(235+(229-235)*k); g=Math.round(182+(103-182)*k); b=Math.round(60+(75-60)*k); }
+  const bg=`rgba(${r},${g},${b},${0.28+t*0.5})`; const tx=t>0.6?'#fff':'#EDF2F8';
+  return {bg,tx};
+}
+const tipEl=$('#tip');
+function tip(e,html){ tipEl.innerHTML=html; tipEl.style.opacity='1'; const x=Math.min(e.clientX+14,window.innerWidth-230); tipEl.style.left=x+'px'; tipEl.style.top=(e.clientY+14)+'px'; }
+function tipHide(){ tipEl.style.opacity='0'; }
+$$('.chip[data-fil="marca"]').forEach(c=>c.onclick=()=>setMarca(c.dataset.val));
+$('#reset').onclick=()=>{ filtro={marca:'todas',pob:null}; render(); };
+render();
+</script>
+</body></html>
